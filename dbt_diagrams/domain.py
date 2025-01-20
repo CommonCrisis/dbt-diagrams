@@ -2,9 +2,9 @@ from enum import Enum
 import re
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Field, ConfigDict
 
-PYDANTIC_MODEL_CONFIG = {"extra": Extra.forbid, "allow_mutation": False}
+PYDANTIC_MODEL_CONFIG = ConfigDict(extra='forbid', frozen=True)
 
 
 class Cardinality(Enum):
@@ -30,7 +30,8 @@ class Cardinality(Enum):
         }[self]
 
 
-class MetaERDConnection(BaseModel, **PYDANTIC_MODEL_CONFIG):
+class MetaERDConnection(BaseModel):
+    model_config = PYDANTIC_MODEL_CONFIG
     target: str
     source_cardinality: Cardinality
     target_cardinality: Cardinality
@@ -38,11 +39,15 @@ class MetaERDConnection(BaseModel, **PYDANTIC_MODEL_CONFIG):
     label: Optional[str] = None
 
 
-class MetaERDSection(BaseModel, **PYDANTIC_MODEL_CONFIG):
+class MetaERDSection(BaseModel,):
+
+    model_config = PYDANTIC_MODEL_CONFIG
     connections: List[MetaERDConnection] = Field(default_factory=list)
 
 
-class Column(BaseModel, **PYDANTIC_MODEL_CONFIG):
+class Column(BaseModel,):
+
+    model_config = PYDANTIC_MODEL_CONFIG
     name: str
     type: Optional[str]
 
@@ -92,7 +97,9 @@ class Column(BaseModel, **PYDANTIC_MODEL_CONFIG):
         return cls(name=col_name, type=col_type)  # type: ignore [arg-type]
 
 
-class Table(BaseModel, **PYDANTIC_MODEL_CONFIG):
+class Table(BaseModel,):
+
+    model_config = PYDANTIC_MODEL_CONFIG
     model_name: str
     rendered_name: str
     target_database: str
@@ -134,7 +141,9 @@ class Table(BaseModel, **PYDANTIC_MODEL_CONFIG):
         )
 
 
-class Relation(BaseModel, **PYDANTIC_MODEL_CONFIG):
+class Relation(BaseModel,):
+
+    model_config = PYDANTIC_MODEL_CONFIG
     diagram: str
     source: Table
     target: Table
